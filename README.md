@@ -4,7 +4,10 @@
 ## Skills used for this project
 * WIP
 * React
+* D3
+* Typescript
 * Javascript
+* Axios
 * CSS
 * HTML 
 * Vite
