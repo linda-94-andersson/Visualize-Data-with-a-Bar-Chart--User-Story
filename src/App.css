@@ -4,3 +4,17 @@
   padding: 2rem;
   text-align: center;
 }
+
+#app {
+  display: flex;
+  justify-content: center;
+}
+
+#card {
+  background-color: white;
+  width: 900px;
+}
+
+#title {
+  color: black;
+}
