@@ -89,8 +89,8 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
 
       tooltip
         .append("text")
-        .attr("x", 10)
-        .attr("y", 20)
+        .attr("x", 50)
+        .attr("y", 160)
         .style("font-size", "12px");
     }
   }, [data, handleMouseOver, handleMouseOut]);
