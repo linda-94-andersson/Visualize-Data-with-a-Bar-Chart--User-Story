@@ -1,8 +1,7 @@
 ## Deployment
-* WIP
+* https://linda-andersson-bar-chart.netlify.app/ 
 
 ## Skills used for this project
-* WIP
 * React
 * D3
 * Typescript
