@@ -33,11 +33,13 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
       const width = 400 - margin.left - margin.right;
       const height = 200 - margin.top - margin.bottom;
 
+      const fromDate = new Date(data[0][0]);
+      const toDate = new Date(data[data.length - 1][0]);
+
       const xScale = d3
-        .scaleBand<string>()
-        .domain(data.map((d) => d[0]))
-        .range([0, width])
-        .padding(0.1);
+        .scaleTime()
+        .domain([fromDate, toDate])
+        .range([0, width]);
 
       const yScale = d3
         .scaleLinear<number>()
@@ -71,10 +73,13 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("class", "bar")
         .attr("data-date", (d) => d[0])
         .attr("data-gdp", (d) => d[1])
-        .attr("x", (d) => xScale(d?.[0]) ?? 0 + margin.left) // Add optional chaining and nullish coalescing
-        .attr("y", (d) => yScale(d?.[1]) ?? 0 + margin.top) // Add optional chaining and nullish coalescing
-        .attr("width", xScale.bandwidth())
-        .attr("height", (d) => height - yScale(d?.[1]) ?? 0) // Add optional chaining and nullish coalescing
+        .attr("x", (d) => xScale(new Date(d[0])) + margin.left) // Use xScale to calculate the correct x position
+        .attr("y", (d) => yScale(d[1]) + margin.top) // Add optional chaining and nullish coalescing
+        .attr(
+          "width",
+          xScale(new Date(data[0][0])) - xScale(new Date(data[1][0]))
+        ) // Calculate the width based on the first two data points
+        .attr("height", (d) => height - yScale(d[1])) // Calculate the height based on the yScale
         .attr("fill", "steelblue")
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut);
