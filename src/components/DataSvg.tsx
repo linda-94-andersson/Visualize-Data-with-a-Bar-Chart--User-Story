@@ -8,21 +8,15 @@ interface DataSvgProps {
 const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const handleMouseOver = useCallback(
-    (
-      event: React.MouseEvent<SVGRectElement, MouseEvent>,
-      d: [string, number]
-    ) => {
-      if (!svgRef.current) return;
+  const handleMouseOver = useCallback((d: [string, number]) => {
+    if (!svgRef.current) return;
 
-      const tooltip = d3.select(svgRef.current).select("#tooltip");
-      const tooltipText = `${d[0]}<br>GDP: ${d[1]}`;
+    const tooltip = d3.select(svgRef.current).select("#tooltip");
+    const tooltipText = `${d[0]}<br>GDP: ${d[1]}`;
 
-      tooltip.select("text").html(tooltipText);
-      tooltip.style("display", "block");
-    },
-    []
-  );
+    tooltip.select("text").html(tooltipText);
+    tooltip.style("display", "block");
+  }, []);
 
   const handleMouseOut = useCallback(() => {
     if (!svgRef.current) return;
