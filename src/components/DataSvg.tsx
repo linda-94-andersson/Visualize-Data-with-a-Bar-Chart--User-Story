@@ -1,5 +1,4 @@
-// DataSvg.tsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
 interface DataSvgProps {
@@ -9,33 +8,51 @@ interface DataSvgProps {
 const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
+  const handleMouseOver = useCallback(
+    (
+      event: React.MouseEvent<SVGRectElement, MouseEvent>,
+      d: [string, number]
+    ) => {
+      if (!svgRef.current) return;
+
+      const tooltip = d3.select(svgRef.current).select("#tooltip");
+      const tooltipText = `${d[0]}<br>GDP: ${d[1]}`;
+
+      tooltip.select("text").html(tooltipText);
+      tooltip.style("display", "block");
+    },
+    []
+  );
+
+  const handleMouseOut = useCallback(() => {
+    if (!svgRef.current) return;
+
+    const tooltip = d3.select(svgRef.current).select("#tooltip");
+    tooltip.style("display", "none");
+  }, []);
+
   useEffect(() => {
     if (svgRef.current && data && data.length > 0) {
-      // Add null check and data length check
       const svg = d3.select(svgRef.current);
 
-      // Chart dimensions and margins
       const margin = { top: 20, right: 20, bottom: 40, left: 60 };
       const width = 400 - margin.left - margin.right;
       const height = 200 - margin.top - margin.bottom;
 
-      // Create x and y scales
       const xScale = d3
-        .scaleBand()
+        .scaleBand<string>()
         .domain(data.map((d) => d[0]))
         .range([0, width])
         .padding(0.1);
 
       const yScale = d3
-        .scaleLinear()
+        .scaleLinear<number>()
         .domain([0, d3.max(data, (d) => d[1]) || 0])
         .range([height, 0]);
 
-      // Create x and y axes
       const xAxis = d3.axisBottom(xScale);
       const yAxis = d3.axisLeft(yScale);
 
-      // Append axes to the SVG
       svg
         .append("g")
         .attr("id", "x-axis")
@@ -48,22 +65,22 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
         .call(yAxis);
 
-      // Create and bind data to the bars
       svg
-        .selectAll(".bar")
+        .selectAll<SVGRectElement, [string, number]>("rect.bar") // Explicitly specify the element type and data type
         .data(data)
         .enter()
         .append("rect")
         .attr("class", "bar")
         .attr("data-date", (d) => d[0])
         .attr("data-gdp", (d) => d[1])
-        .attr("x", (d) => xScale(d[0]) + margin.left)
-        .attr("y", (d) => yScale(d[1]) + margin.top)
+        .attr("x", (d) => xScale(d?.[0]) ?? 0 + margin.left) // Add optional chaining and nullish coalescing
+        .attr("y", (d) => yScale(d?.[1]) ?? 0 + margin.top) // Add optional chaining and nullish coalescing
         .attr("width", xScale.bandwidth())
-        .attr("height", (d) => height - yScale(d[1]))
-        .attr("fill", "steelblue");
+        .attr("height", (d) => height - yScale(d?.[1]) ?? 0) // Add optional chaining and nullish coalescing
+        .attr("fill", "steelblue")
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut);
 
-      // Tooltip
       const tooltip = svg
         .append("g")
         .attr("id", "tooltip")
@@ -81,23 +98,10 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("x", 10)
         .attr("y", 20)
         .style("font-size", "12px");
-
-      // Mouse event handlers to show/hide tooltip
-      svg
-        .selectAll(".bar")
-        .on("mouseover", (event, d) => {
-          const tooltipText = `${d[0]}<br>GDP: ${d[1]}`;
-          tooltip.select("text").html(tooltipText);
-          tooltip.style("display", "block");
-        })
-        .on("mouseout", () => {
-          tooltip.style("display", "none");
-        });
     }
-  }, [data]);
+  }, [data, handleMouseOver, handleMouseOut]);
 
   if (!data || data.length === 0) {
-    // Handle the case when data is not available yet
     return <div>Loading...</div>;
   }
 
