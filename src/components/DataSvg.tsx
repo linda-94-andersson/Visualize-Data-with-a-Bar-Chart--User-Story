@@ -29,9 +29,9 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
     if (svgRef.current && data && data.length > 0) {
       const svg = d3.select(svgRef.current);
 
-      const margin = { top: 20, right: 20, bottom: 40, left: 60 };
-      const width = 400 - margin.left - margin.right;
-      const height = 200 - margin.top - margin.bottom;
+      const margin = { top: 30, right: 30, bottom: 60, left: 80 };
+      const width = 600 - margin.left - margin.right;
+      const height = 300 - margin.top - margin.bottom;
 
       const fromDate = new Date(data[0][0]);
       const toDate = new Date(data[data.length - 1][0]);
@@ -80,7 +80,7 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("data-gdp", (d) => d[1])
         .attr("x", (d) => xScale(new Date(d[0])) + margin.left)
         .attr("y", (d) => yScale(d[1]) + margin.top)
-        .attr("width", (d) => xScale(new Date(d[0])) - xScale(fromDate)) // Calculate the width based on the data point and the start date
+        .attr("width", (d) => xScale(new Date(d[0])) - xScale(fromDate))
         .attr("height", (d) => height - yScale(d[1]))
         .attr("fill", "steelblue")
         .on("mouseover", handleMouseOver)
@@ -110,7 +110,7 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
     return <div>Loading...</div>;
   }
 
-  return <svg width="400" height="200" ref={svgRef}></svg>;
+  return <svg width="600" height="300" ref={svgRef}></svg>;
 };
 
 export default DataSvg;
