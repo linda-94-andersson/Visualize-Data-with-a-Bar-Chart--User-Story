@@ -51,13 +51,17 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .append("g")
         .attr("id", "x-axis")
         .attr("transform", `translate(${margin.left}, ${height + margin.top})`)
-        .call(xAxis);
+        .call(xAxis)
+        .selectAll("text")
+        .attr("fill", "black");
 
       svg
         .append("g")
         .attr("id", "y-axis")
         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-        .call(yAxis);
+        .call(yAxis)
+        .selectAll("text")
+        .attr("fill", "black");
 
       svg
         .selectAll<SVGRectElement, [string, number]>("rect.bar") // Explicitly specify the element type and data type
