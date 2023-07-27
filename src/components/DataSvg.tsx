@@ -39,10 +39,11 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
       const xScale = d3
         .scaleTime()
         .domain([fromDate, toDate])
-        .range([0, width]);
+        .range([0, width])
+        .nice();
 
       const yScale = d3
-        .scaleLinear<number>()
+        .scaleLinear()
         .domain([0, d3.max(data, (d) => d[1]) || 0])
         .range([height, 0]);
 
@@ -55,7 +56,11 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("transform", `translate(${margin.left}, ${height + margin.top})`)
         .call(xAxis)
         .selectAll("text")
-        .attr("fill", "black");
+        .attr("fill", "black")
+        .style("text-anchor", "end")
+        .attr("dx", "-0.8em")
+        .attr("dy", "-0.15em")
+        .attr("transform", "rotate(-45)");
 
       svg
         .append("g")
@@ -66,20 +71,17 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("fill", "black");
 
       svg
-        .selectAll<SVGRectElement, [string, number]>("rect.bar") // Explicitly specify the element type and data type
+        .selectAll<SVGRectElement, [string, number]>("rect.bar")
         .data(data)
         .enter()
         .append("rect")
         .attr("class", "bar")
         .attr("data-date", (d) => d[0])
         .attr("data-gdp", (d) => d[1])
-        .attr("x", (d) => xScale(new Date(d[0])) + margin.left) // Use xScale to calculate the correct x position
-        .attr("y", (d) => yScale(d[1]) + margin.top) // Add optional chaining and nullish coalescing
-        .attr(
-          "width",
-          xScale(new Date(data[0][0])) - xScale(new Date(data[1][0]))
-        ) // Calculate the width based on the first two data points
-        .attr("height", (d) => height - yScale(d[1])) // Calculate the height based on the yScale
+        .attr("x", (d) => xScale(new Date(d[0])) + margin.left)
+        .attr("y", (d) => yScale(d[1]) + margin.top)
+        .attr("width", (d) => xScale(new Date(d[0])) - xScale(fromDate)) // Calculate the width based on the data point and the start date
+        .attr("height", (d) => height - yScale(d[1]))
         .attr("fill", "steelblue")
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut);
