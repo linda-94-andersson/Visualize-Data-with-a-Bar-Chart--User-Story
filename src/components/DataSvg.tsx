@@ -8,17 +8,6 @@ interface DataSvgProps {
 const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const handleMouseOver = (event: any, d: [string, number]) => {
-    if (!svgRef.current) return;
-
-    const tooltip = d3.select("#tooltip");
-    const tooltipText = `${d[0]} GDP: ${d[1]}`;
-
-    tooltip.select(".tooltip-text").text(tooltipText);
-    tooltip.style("display", "block");
-    tooltip.attr("data-date", d[0]);
-  };
-
   const handleMouseOut = useCallback(() => {
     if (!svgRef.current) return;
 
@@ -29,6 +18,17 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
   useEffect(() => {
     if (svgRef.current && data && data.length > 0) {
       const svg = d3.select(svgRef.current);
+
+      const handleMouseOver = (_event: MouseEvent, d: [string, number]) => {
+        if (!svgRef.current) return;
+
+        const tooltip = svg.select("#tooltip");
+        const tooltipText = `${d[0]} GDP: ${d[1]}`;
+
+        tooltip.select(".tooltip-text").text(tooltipText);
+        tooltip.style("display", "block");
+        tooltip.attr("data-date", d[0]);
+      };
 
       const margin = { top: 40, right: 40, bottom: 80, left: 100 };
       const width = 800 - margin.left - margin.right;
@@ -84,7 +84,7 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .attr("width", (d) => xScale(new Date(d[0])) - xScale(fromDate))
         .attr("height", (d) => height - yScale(d[1]))
         .attr("fill", "steelblue")
-        .on("mouseover", (event, d) => handleMouseOver(event, d))
+        .on("mouseover", (e, d) => handleMouseOver(e, d))
         .on("mouseout", handleMouseOut);
 
       const tooltip = svg
@@ -107,7 +107,7 @@ const DataSvg: React.FC<DataSvgProps> = ({ data }) => {
         .style("text-anchor", "middle")
         .attr("class", "tooltip-text");
     }
-  }, [data, handleMouseOver, handleMouseOut]);
+  }, [data, handleMouseOut]);
 
   if (!data || data.length === 0) {
     return <div>Loading...</div>;
